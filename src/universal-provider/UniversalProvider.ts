@@ -234,10 +234,14 @@ export class UniversalProvider implements IUniversalProvider {
   private async checkStorage() {
     this.namespaces = await this.getFromStore("namespaces");
     this.optionalNamespaces = (await this.getFromStore("optionalNamespaces")) || {};
-    if (this.client.session.length) {
-      const lastKeyIndex = this.client.session.keys.length - 1;
-      this.session = this.client.session.get(this.client.session.keys[lastKeyIndex]);
-      this.createProviders();
+    const sessionKeys = this.client.session.keys
+    for (let i = sessionKeys.length - 1; i >= 0; i--) {
+      const session = this.client.session.get(sessionKeys[`${i}`])
+      if (session.namespaces[this.providerOpts.namespace]) {
+        this.session = session
+        this.createProviders()
+        return
+      }
     }
   }
 

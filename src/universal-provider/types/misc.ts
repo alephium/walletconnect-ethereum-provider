@@ -7,6 +7,7 @@ import { IEvents } from "@walletconnect/events";
 import { IProvider } from "./providers";
 
 export interface UniversalProviderOpts {
+  namespace: string;
   projectId?: string;
   metadata?: Metadata;
   logger?: string;

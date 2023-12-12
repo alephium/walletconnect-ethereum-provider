@@ -499,6 +499,7 @@ export class EthereumProvider implements IEthereumProvider {
       ? getEthereumChainId(this.rpc.chains)
       : getEthereumChainId(this.rpc.optionalChains);
     this.signer = await UniversalProvider.init({
+      namespace: this.namespace,
       projectId: this.rpc.projectId,
       metadata: this.rpc.metadata,
       disableProviderPing: opts.disableProviderPing,
