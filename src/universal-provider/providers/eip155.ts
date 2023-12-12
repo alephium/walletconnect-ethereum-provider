@@ -14,6 +14,7 @@ import {
 import { getChainId, getGlobal, getRpcUrl } from "../utils";
 import EventEmitter from "events";
 import { PROVIDER_EVENTS } from "../constants";
+import { handleDeepLinks } from "../utils/deepLinks";
 
 class Eip155Provider implements IProvider {
   public name = "eip155";
@@ -47,6 +48,7 @@ class Eip155Provider implements IProvider {
         break;
     }
     if (this.namespace.methods.includes(args.request.method)) {
+      handleDeepLinks(this.client, args)
       return await this.client.request(args as EngineTypes.RequestParams);
     }
     return this.getHttpProvider().request(args.request);

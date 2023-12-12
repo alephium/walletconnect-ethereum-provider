@@ -32,7 +32,7 @@ import {
   ProviderAccounts,
 } from "./types";
 
-import { RELAY_URL, LOGGER, STORAGE, PROVIDER_EVENTS } from "./constants";
+import { RELAY_URL, LOGGER, STORAGE, PROVIDER_EVENTS, DEEP_LINK_KEY } from "./constants";
 import EventEmitter from "events";
 
 export class UniversalProvider implements IUniversalProvider {
@@ -174,6 +174,8 @@ export class UniversalProvider implements IUniversalProvider {
       if (uri) {
         this.uri = uri;
         this.events.emit("display_uri", uri);
+        const deepLink = JSON.stringify({ href: uri })
+        await this.client.core.storage.setItem(DEEP_LINK_KEY, deepLink)
       }
 
       await approval()
@@ -489,6 +491,7 @@ export class UniversalProvider implements IUniversalProvider {
     this.persist("optionalNamespaces", undefined);
     this.persist("sessionProperties", undefined);
     await this.cleanupPendingPairings({ deletePairings: true });
+    await this.client.core.storage.removeItem(DEEP_LINK_KEY)
   }
 
   private persist(key: string, data: unknown) {
