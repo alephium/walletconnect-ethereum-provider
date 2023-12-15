@@ -1,7 +1,7 @@
 {
   "name": "@alephium/walletconnect-ethereum-provider",
   "description": "Ethereum Provider for WalletConnect Protocol",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "WalletConnect, Inc. <walletconnect.com>",
   "homepage": "https://github.com/alephium/walletconnect-ethereum-provider/",
   "repository": {
