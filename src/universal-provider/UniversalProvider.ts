@@ -353,49 +353,57 @@ export class UniversalProvider implements IUniversalProvider {
     }
 
     this.client.on("session_ping", (args) => {
-      this.events.emit("session_ping", args);
+      if (args.topic === this.session?.topic) {
+        this.events.emit("session_ping", args);
+      }
     });
 
     this.client.on("session_event", (args) => {
-      const { params } = args;
-      const { event } = params;
-      if (event.name === "accountsChanged") {
-        const accounts = event.data;
-        if (accounts && isValidArray(accounts))
-          this.events.emit("accountsChanged", accounts.map(parseCaip10Account));
-      } else if (event.name === "chainChanged") {
-        const requestChainId = params.chainId;
-        const payloadChainId = params.event.data as number;
-        const namespace = parseNamespaceKey(requestChainId);
-        // chainIds might differ between the request & payload - request is always in CAIP2 format, while payload might be string, number, CAIP2 or hex
-        // take priority of the payload chainId
-        const chainIdToProcess =
-          convertChainIdToNumber(requestChainId) !== convertChainIdToNumber(payloadChainId)
-            ? `${namespace}:${convertChainIdToNumber(payloadChainId)}`
-            : requestChainId;
-        this.onChainChanged(chainIdToProcess);
-      } else {
-        this.events.emit(event.name, event.data);
-      }
+      if (args.topic === this.session?.topic) {
+        const { params } = args;
+        const { event } = params;
+        if (event.name === "accountsChanged") {
+          const accounts = event.data;
+          if (accounts && isValidArray(accounts))
+            this.events.emit("accountsChanged", accounts.map(parseCaip10Account));
+        } else if (event.name === "chainChanged") {
+          const requestChainId = params.chainId;
+          const payloadChainId = params.event.data as number;
+          const namespace = parseNamespaceKey(requestChainId);
+          // chainIds might differ between the request & payload - request is always in CAIP2 format, while payload might be string, number, CAIP2 or hex
+          // take priority of the payload chainId
+          const chainIdToProcess =
+            convertChainIdToNumber(requestChainId) !== convertChainIdToNumber(payloadChainId)
+              ? `${namespace}:${convertChainIdToNumber(payloadChainId)}`
+              : requestChainId;
+          this.onChainChanged(chainIdToProcess);
+        } else {
+          this.events.emit(event.name, event.data);
+        }
 
-      this.events.emit("session_event", args);
+        this.events.emit("session_event", args);
+      }
     });
 
     this.client.on("session_update", ({ topic, params }) => {
-      const { namespaces } = params;
-      const _session = this.client?.session.get(topic);
-      this.session = { ..._session, namespaces } as SessionTypes.Struct;
-      this.onSessionUpdate();
-      this.events.emit("session_update", { topic, params });
+        if (topic === this.session?.topic) {
+        const { namespaces } = params;
+        const _session = this.client?.session.get(topic);
+        this.session = { ..._session, namespaces } as SessionTypes.Struct;
+        this.onSessionUpdate();
+        this.events.emit("session_update", { topic, params });
+      }
     });
 
     this.client.on("session_delete", async (payload) => {
-      await this.cleanup();
-      this.events.emit("session_delete", payload);
-      this.events.emit("disconnect", {
-        ...getSdkError("USER_DISCONNECTED"),
-        data: payload.topic,
-      });
+      if (payload.topic === this.session?.topic) {
+        await this.cleanup();
+        this.events.emit("session_delete", payload);
+        this.events.emit("disconnect", {
+          ...getSdkError("USER_DISCONNECTED"),
+          data: payload.topic,
+        });
+      }
     });
 
     this.on(PROVIDER_EVENTS.DEFAULT_CHAIN_CHANGED, (caip2ChainId: string) => {
