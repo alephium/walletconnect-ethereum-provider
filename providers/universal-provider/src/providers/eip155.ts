@@ -26,6 +26,21 @@ import {
 import EventEmitter from "events";
 import { BUNDLER_URL, PROVIDER_EVENTS } from "../constants/index.js";
 
+const FORWARD_METHOD_LIST = [
+  "eth_sendRawTransaction",
+  "eth_sendTransaction",
+  "eth_sign",
+  "eth_signTransaction",
+  "eth_signTypedData",
+  "eth_signTypedData_v3",
+  "eth_signTypedData_v4",
+  "personal_sign",
+];
+
+function shouldForwardToWallet(method: string): boolean {
+  return FORWARD_METHOD_LIST.includes(method) || method.startsWith("wallet_");
+}
+
 class Eip155Provider implements IProvider {
   public name = "eip155";
   public client: Client;
@@ -65,7 +80,7 @@ class Eip155Provider implements IProvider {
       default:
         break;
     }
-    if (this.namespace.methods.includes(args.request.method)) {
+    if (shouldForwardToWallet(args.request.method)) {
       return await this.client.request(args as EngineTypes.RequestParams);
     }
     return this.getHttpProvider().request(args.request);
