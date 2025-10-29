@@ -1,82 +1,45 @@
-# @walletconnect/ethereum-provider
+# WalletConnect v2.x.x
 
-Ethereum Provider for WalletConnect Protocol.
+Open protocol for connecting Wallets to Dapps - https://walletconnect.com
 
-## Installation
+## Setup
 
-```
-npm i @walletconnect/ethereum-provider @walletconnect/modal
-```
+1. Ensure [nodejs](https://nodejs.org) and [npm](https://www.npmjs.com)
+2. Clone the repository
+3. Install all package dependencies, by running `npm install` from the root folder
 
-## Initialization
+## Running checks for all packages
 
-```typescript
-import { EthereumProvider } from "@walletconnect/ethereum-provider";
+To ensure all packages lint, build and test correctly, we can run the following command from the root folder:
 
-const provider = await EthereumProvider.init({
-  projectId, // REQUIRED your projectId
-  chains, // REQUIRED chain ids
-  showQrModal, // REQUIRED set to "true" to use @walletconnect/modal,
-  methods, // OPTIONAL ethereum methods
-  events, // OPTIONAL ethereum events
-  rpcMap, // OPTIONAL rpc urls for each chain
-  metadata, // OPTIONAL metadata of your app
-  qrModalOptions, // OPTIONAL - `undefined` by default
-});
+> **For tests to pass in the following command, you will need your own `TEST_PROJECT_ID` value**,
+> which will be generated for you when you set up a new project on [WalletConnect Cloud](https://cloud.walletconnect.com).
+
+```zsh
+TEST_PROJECT_ID=YOUR_PROJECT_ID npm run check
 ```
 
-## Display WalletConnectModal with QR code / Handle connection URI
+## Command Overview
 
-```typescript
-// WalletConnectModal is disabled by default, enable it during init() to display a QR code modal
-await provider.connect({
-  chains, // OPTIONAL chain ids
-  rpcMap, // OPTIONAL rpc urls
-  pairingTopic, // OPTIONAL pairing topic
-});
-// or
-await provider.enable();
+- `clean` - Removes build folders from all packages
+- `lint` - Runs [eslint](https://eslint.org/) checks
+- `prettier` - Runs [prettier](https://prettier.io/) checks
+- `build` - Builds all packages
+- `test` - Tests all packages
+- `check` - Shorthand to run lint, build and test commands
+- `reset` - Shorthand to run clean and check commands
+
+## Troubleshooting
+
+1. If you are experiencing issues with installation ensure you install `npm i -g node-gyp`
+2. You will need to have xcode command line tools installed
+3. If there are issues with xcode command line tools try running
+
+```zsh
+sudo xcode-select --switch /Library/Developer/CommandLineTools
+sudo xcode-select --reset
 ```
 
-```typescript
-// If you are not using WalletConnectModal,
-// you can subscribe to the `display_uri` event and handle the URI yourself.
-provider.on("display_uri", (uri: string) => {
-  // ... custom logic
-});
+## License
 
-await provider.connect();
-// or
-await provider.enable();
-```
-
-## Sending Requests
-
-```typescript
-const result = await provider.request({ method: "eth_requestAccounts" });
-
-// OR
-
-provider.sendAsync({ method: "eth_requestAccounts" }, CallBackFunction);
-```
-
-## Events
-
-```typescript
-// chain changed
-provider.on("chainChanged", handler);
-// accounts changed
-provider.on("accountsChanged", handler);
-// session established
-provider.on("connect", handler);
-// session event - chainChanged/accountsChanged/custom events
-provider.on("session_event", handler);
-// connection uri
-provider.on("display_uri", handler);
-// session disconnect
-provider.on("disconnect", handler);
-```
-
-## Supported WalletConnectModal options (qrModalOptions)
-
-Please reference [up to date documentation](https://docs.walletconnect.com/2.0/web/web3modal/html/ethereum-provider/options) for `WalletConnectModal`
+Apache 2.0
