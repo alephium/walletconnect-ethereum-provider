@@ -1,4 +1,4 @@
-# WalletConnect v2.x.x
+# Ethereum WalletConnect Providers (Forked from WalletConnect)
 
 Open protocol for connecting Wallets to Dapps - https://walletconnect.com
 

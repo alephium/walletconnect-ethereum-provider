@@ -1,5 +1,5 @@
 {
-  "description": "Monorepo for WalletConnect",
+  "description": "Monorepo for Ethereum WalletConnect Providers (Forked from WalletConnect)",
   "private": true,
   "keywords": [
     "wallet",
