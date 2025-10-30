@@ -1,11 +1,13 @@
-import { name, dependencies, peerDependencies } from "./package.json";
 import esbuild from "rollup-plugin-esbuild";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import json from "@rollup/plugin-json";
+import visualizer from "rollup-plugin-visualizer";
 
-const input = "./src/index.ts";
-const plugins = [
+export const input = "./src/index.ts";
+export const plugins = [
   nodeResolve({ preferBuiltins: false, browser: true }),
+  json(),
   commonjs(),
   esbuild({
     minify: true,
@@ -14,14 +16,16 @@ const plugins = [
       ".json": "json",
     },
   }),
+  visualizer(),
 ];
 
-function createConfig(
+export default function createConfig(
   packageName,
   packageDependencies,
   umd = {},
   cjs = {},
   es = {},
+  extraBuilds = [],
 ) {
   return [
     {
@@ -42,7 +46,7 @@ function createConfig(
       external: packageDependencies,
       output: [
         {
-          file: "./dist/index.cjs.js",
+          file: "./dist/index.cjs",
           format: "cjs",
           exports: "named",
           name: packageName,
@@ -50,7 +54,7 @@ function createConfig(
           ...cjs,
         },
         {
-          file: "./dist/index.es.js",
+          file: "./dist/index.js",
           format: "es",
           exports: "named",
           name: packageName,
@@ -59,13 +63,6 @@ function createConfig(
         },
       ],
     },
+    ...extraBuilds,
   ];
 }
-
-export default createConfig(
-  name,
-  Object.keys({ ...dependencies, ...peerDependencies }),
-  { inlineDynamicImports: true },
-  { inlineDynamicImports: true },
-  { inlineDynamicImports: true },
-);
